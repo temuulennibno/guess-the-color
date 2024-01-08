@@ -1,4 +1,10 @@
-import { Alert, StyleSheet, Text, Touchable, TouchableHighlight, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+  Button,
+} from "react-native";
 import { Container } from "./components/container";
 import { Dimensions } from "react-native";
 import { useEffect, useRef, useState } from "react";
@@ -8,19 +14,43 @@ type Tile = {
   isOdd: boolean;
 };
 
+const getRandomNumber = () => Math.floor(Math.random() * 256);
+
+const getRandomColor = () => {
+  return [getRandomNumber(), getRandomNumber(), getRandomNumber()];
+};
+
+const getRandomColors = (length: number, margin: number) => {
+  const tiles = [];
+  const color = getRandomColor();
+  for (let i = 0; i < length; i++) {
+    tiles.push({
+      color: `rgb(${color[0]},${color[1]},${color[2]})`,
+      isOdd: false,
+    });
+  }
+  const randomIndex = Math.floor(Math.random() * length);
+  tiles[randomIndex] = {
+    color: `rgb(${color[0] + margin},${color[1] + margin},${
+      color[2] + margin
+    })`,
+    isOdd: true,
+  };
+  return tiles;
+};
+
 export default function App() {
   const [score, setScore] = useState(0);
-  const [seconds, setSeconds] = useState(60);
+  const [seconds, setSeconds] = useState(30);
+  const [isGameOver, setIsGameOver] = useState(false);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [tiles, setTiles] = useState<Tile[]>([
-    { color: "red", isOdd: false },
-    { color: "red", isOdd: false },
-    { color: "blue", isOdd: true },
-  ]);
+  const [tiles, setTiles] = useState<Tile[]>(getRandomColors(9, 100));
 
   useEffect(() => {
-    if (seconds === 0) {
+    if (seconds === 0 || seconds < 0) {
+      // GAME OVER
+      setIsGameOver(true);
       clearInterval(intervalRef.current!);
     }
     intervalRef.current = setInterval(() => {
@@ -36,7 +66,8 @@ export default function App() {
 
   const handleCorrect = () => {
     setScore(score + 1);
-    setSeconds(seconds + 10);
+    const newTiles = getRandomColors(9, 100 / score);
+    setTiles(newTiles);
   };
 
   return (
@@ -44,7 +75,14 @@ export default function App() {
       <Text style={styles.title}>
         Өөр <Text style={styles.oddTitle}>өнгийг</Text> ол!
       </Text>
-      <View style={{ padding: 16, display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+      <View
+        style={{
+          padding: 16,
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
         <Text>{seconds} секунд</Text>
         <Text style={styles.score}>Оноо {score}</Text>
       </View>
@@ -55,29 +93,55 @@ export default function App() {
               onPress={() => {
                 if (tile.isOdd) {
                   handleCorrect();
+                } else {
+                  setSeconds(seconds - 3);
                 }
               }}
             >
-              <View style={{ ...styles.tile, backgroundColor: tile.color }}></View>
+              <View
+                style={{ ...styles.tile, backgroundColor: tile.color }}
+              ></View>
             </TouchableWithoutFeedback>
           </View>
         ))}
       </View>
+      {isGameOver && (
+        <View style={styles.gameOverView}>
+          <Text style={styles.gameOverText}>
+            Тоглоом дууслаа.{"\n"} Таны оноо: {score}{" "}
+          </Text>
+          <Button title="Шинээр эхлэх" />
+        </View>
+      )}
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
+  gameOverView: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  gameOverText: {
+    color: "#FFf",
+    fontWeight: "bold",
+    fontSize: 24,
+    textAlign: "center",
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
   },
   oddTitle: {
-    color: "rgba(0,0,0,0.5)",
+    color: "rgba(255,255,255,0.5)",
   },
   score: {
-    color: "#363636",
+    color: "#fff",
   },
   board: {
     flex: 1,

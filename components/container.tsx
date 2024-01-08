@@ -14,7 +14,7 @@ export const Container = ({ children }: React.PropsWithChildren) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#999",
     paddingTop: Constants.statusBarHeight,
   },
 });
