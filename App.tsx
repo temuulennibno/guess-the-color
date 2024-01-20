@@ -1,13 +1,8 @@
-import {
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-  Button,
-} from "react-native";
+import { StyleSheet, Text, TouchableWithoutFeedback, View, Button } from "react-native";
 import { Container } from "./components/container";
 import { Dimensions } from "react-native";
 import { useEffect, useRef, useState } from "react";
+import { NavigationContainer } from "@react-navigation/native";
 
 type Tile = {
   color: string;
@@ -31,9 +26,7 @@ const getRandomColors = (length: number, margin: number) => {
   }
   const randomIndex = Math.floor(Math.random() * length);
   tiles[randomIndex] = {
-    color: `rgb(${color[0] + margin},${color[1] + margin},${
-      color[2] + margin
-    })`,
+    color: `rgb(${color[0] + margin},${color[1] + margin},${color[2] + margin})`,
     isOdd: true,
   };
   return tiles;
@@ -72,47 +65,47 @@ export default function App() {
 
   return (
     <Container>
-      <Text style={styles.title}>
-        Өөр <Text style={styles.oddTitle}>өнгийг</Text> ол!
-      </Text>
-      <View
-        style={{
-          padding: 16,
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text>{seconds} секунд</Text>
-        <Text style={styles.score}>Оноо {score}</Text>
-      </View>
-      <View style={styles.board}>
-        {tiles.map((tile, index) => (
-          <View style={styles.tileGrid} key={`tile-${index}`}>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                if (tile.isOdd) {
-                  handleCorrect();
-                } else {
-                  setSeconds(seconds - 3);
-                }
-              }}
-            >
-              <View
-                style={{ ...styles.tile, backgroundColor: tile.color }}
-              ></View>
-            </TouchableWithoutFeedback>
-          </View>
-        ))}
-      </View>
-      {isGameOver && (
-        <View style={styles.gameOverView}>
-          <Text style={styles.gameOverText}>
-            Тоглоом дууслаа.{"\n"} Таны оноо: {score}{" "}
-          </Text>
-          <Button title="Шинээр эхлэх" />
+      <NavigationContainer>
+        <Text style={styles.title}>
+          Өөр <Text style={styles.oddTitle}>өнгийг</Text> ол!
+        </Text>
+        <View
+          style={{
+            padding: 16,
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text>{seconds} секунд</Text>
+          <Text style={styles.score}>Оноо {score}</Text>
         </View>
-      )}
+        <View style={styles.board}>
+          {tiles.map((tile, index) => (
+            <View style={styles.tileGrid} key={`tile-${index}`}>
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  if (tile.isOdd) {
+                    handleCorrect();
+                  } else {
+                    setSeconds(seconds - 3);
+                  }
+                }}
+              >
+                <View style={{ ...styles.tile, backgroundColor: tile.color }}></View>
+              </TouchableWithoutFeedback>
+            </View>
+          ))}
+        </View>
+        {isGameOver && (
+          <View style={styles.gameOverView}>
+            <Text style={styles.gameOverText}>
+              Тоглоом дууслаа.{"\n"} Таны оноо: {score}{" "}
+            </Text>
+            <Button title="Шинээр эхлэх" />
+          </View>
+        )}
+      </NavigationContainer>
     </Container>
   );
 }
